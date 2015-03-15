@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libmega
+Description: Mega library
+Version: 1.9.94
+Requires: gio-2.0 >= 2.32.0 libcurl openssl
+Libs: -L${libdir} -lmega
+Cflags: -I${includedir}

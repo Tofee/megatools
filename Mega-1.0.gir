@@ -1,0 +1,1475 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="Gio" version="2.0"/>
+  <package name="libmega"/>
+  <c:include name="mega/mega.h"/>
+  <namespace name="Mega"
+             version="1.0"
+             shared-library="libmega.so.0"
+             c:identifier-prefixes="Mega"
+             c:symbol-prefixes="mega">
+    <class name="AesCtrEncryptor"
+           c:symbol-prefix="aes_ctr_encryptor"
+           c:type="MegaAesCtrEncryptor"
+           parent="GObject.Object"
+           glib:type-name="MegaAesCtrEncryptor"
+           glib:get-type="mega_aes_ctr_encryptor_get_type"
+           glib:type-struct="AesCtrEncryptorClass">
+      <implements name="Gio.Converter"/>
+      <constructor name="new" c:identifier="mega_aes_ctr_encryptor_new">
+        <doc xml:whitespace="preserve">Create new #MegaAesCtrEncryptor object.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaAesCtrEncryptor object.</doc>
+          <type name="AesCtrEncryptor" c:type="MegaAesCtrEncryptor*"/>
+        </return-value>
+      </constructor>
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="priv">
+        <type name="AesCtrEncryptorPrivate"
+              c:type="MegaAesCtrEncryptorPrivate*"/>
+      </field>
+    </class>
+    <record name="AesCtrEncryptorClass"
+            c:type="MegaAesCtrEncryptorClass"
+            glib:is-gtype-struct-for="AesCtrEncryptor">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+    </record>
+    <record name="AesCtrEncryptorPrivate"
+            c:type="MegaAesCtrEncryptorPrivate"
+            disguised="1">
+    </record>
+    <class name="AesKey"
+           c:symbol-prefix="aes_key"
+           c:type="MegaAesKey"
+           parent="GObject.Object"
+           glib:type-name="MegaAesKey"
+           glib:get-type="mega_aes_key_get_type"
+           glib:type-struct="AesKeyClass">
+      <doc xml:whitespace="preserve">128 bit (16 byte) AES key is used to perform various kinds of encryption and
+decryption within Mega. MegaAesKey represents this key and simplifies it's 
+use within the application.
+
+The binary key's data needs to be loaded into MegaAesKey object before any of
+the encryption/decryption methods can be called. 
+
+There are several ways to load a key, modelled after how it's stored on Mega
+or within the application:
+
+- From it's binary form (16 byte buffer)
+- From Mega's modified URL friendly UBase64 formatted string (22 byte string)
+- Decrypted by other AES key from binary form or UBase64 formatted string
+- Derived from a plain text password
+- Generated randomly
+
+Operations that can be performed with a key:
+
+(Unless otherwise stated all operations work on a data which are sized to the
+multiples of 16 bytes.)
+
+- Modeless encryption/decryption of a binary buffer using #mega_aes_key_encrypt_raw
+  or #mega_aes_key_decrypt_raw
+
+- Modeless encryption/decryption to/from UBase64 encoded data using
+  #mega_aes_key_encrypt or #mega_aes_key_decrypt
+
+- CBC mode encryption/decryption with zero IV to/from UBase64 encoded data
+  using #mega_aes_key_encrypt_cbc or #mega_aes_key_decrypt_cbc.
+
+- Zero terminated string CBC mode encryption to UBase64 encoded data. The
+  input string is automatically zero padded to multiples of 16 bytes.
+
+- CTR mode encryption/decryption initialized with 8 byte nonce and 64bit
+  block position using #mega_aes_key_setup_ctr and #mega_aes_key_encrypt_ctr
+  (also used for decryption, because it's a symetric operation).
+
+- Transform username to a UBase64 encoded hash used for session
+  setup/authentication in Mega.</doc>
+      <constructor name="new" c:identifier="mega_aes_key_new">
+        <doc xml:whitespace="preserve">Create new #MegaAesKey object.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaAesKey object.</doc>
+          <type name="AesKey" c:type="MegaAesKey*"/>
+        </return-value>
+      </constructor>
+      <constructor name="new_from_binary"
+                   c:identifier="mega_aes_key_new_from_binary">
+        <doc xml:whitespace="preserve">Create new #MegaAesKey object from binary data.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaAesKey object.</doc>
+          <type name="AesKey" c:type="MegaAesKey*"/>
+        </return-value>
+        <parameters>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">16 byte AES key buffer</doc>
+            <array zero-terminated="0" c:type="guchar*" fixed-size="16">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_enc_binary"
+                   c:identifier="mega_aes_key_new_from_enc_binary">
+        <doc xml:whitespace="preserve">Create new #MegaAesKey object by decrypting 16 byte data with #dec_key.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaAesKey object.</doc>
+          <type name="AesKey" c:type="MegaAesKey*"/>
+        </return-value>
+        <parameters>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">16 byte AES key buffer</doc>
+            <array zero-terminated="0" c:type="guchar*" fixed-size="16">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="dec_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Decryption key</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_enc_ubase64"
+                   c:identifier="mega_aes_key_new_from_enc_ubase64">
+        <doc xml:whitespace="preserve">Create new #MegaAesKey object by decrypting UBase64 encoded #data with
+#dec_key.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaAesKey object.</doc>
+          <type name="AesKey" c:type="MegaAesKey*"/>
+        </return-value>
+        <parameters>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">UBase64 encoded 16 byte AES key data</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+          <parameter name="dec_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Decryption key</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_password"
+                   c:identifier="mega_aes_key_new_from_password">
+        <doc xml:whitespace="preserve">Create new #MegaAesKey object from password.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaAesKey object.</doc>
+          <type name="AesKey" c:type="MegaAesKey*"/>
+        </return-value>
+        <parameters>
+          <parameter name="password" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Password</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_from_ubase64"
+                   c:identifier="mega_aes_key_new_from_ubase64">
+        <doc xml:whitespace="preserve">Create new #MegaAesKey object preloaded with #data.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaAesKey object.</doc>
+          <type name="AesKey" c:type="MegaAesKey*"/>
+        </return-value>
+        <parameters>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">UBase64 encoded 16 byte AES key data</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_generated"
+                   c:identifier="mega_aes_key_new_generated">
+        <doc xml:whitespace="preserve">Create new #MegaAesKey object with random key.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaAesKey object.</doc>
+          <type name="AesKey" c:type="MegaAesKey*"/>
+        </return-value>
+      </constructor>
+      <method name="decrypt" c:identifier="mega_aes_key_decrypt">
+        <doc xml:whitespace="preserve">Decrypt UBase64 encoded 16-byte aligned ciphertext into binary plaintext data.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">Binary plaintext data.</doc>
+          <type name="GLib.Bytes" c:type="GBytes*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="cipher" transfer-ownership="none">
+            <doc xml:whitespace="preserve">UBase64 encoded ciphertext.</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="decrypt_cbc" c:identifier="mega_aes_key_decrypt_cbc">
+        <doc xml:whitespace="preserve">Decrypt UBase64 encoded ciphertext blocks using AES key in CBC mode with zero IV.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">UBase64 encoded ciphertext.</doc>
+          <type name="GLib.Bytes" c:type="GBytes*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="cipher" transfer-ownership="none">
+            <doc xml:whitespace="preserve">UBase64 encoded ciphertext.</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="decrypt_cbc_raw"
+              c:identifier="mega_aes_key_decrypt_cbc_raw">
+        <doc xml:whitespace="preserve">Decrypt ciphertext blocks using AES key in CBC mode with zero IV</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="cipher" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Ciphertext</doc>
+            <array length="2" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="plain"
+                     direction="out"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <doc xml:whitespace="preserve">Plaintext output data</doc>
+            <array length="2" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="len"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full">
+            <doc xml:whitespace="preserve">16 byte aligned length of ciphertext and plaintext data.</doc>
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="decrypt_raw" c:identifier="mega_aes_key_decrypt_raw">
+        <doc xml:whitespace="preserve">Decrypt ciphertext blocks using AES key</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="cipher" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Ciphertext</doc>
+            <array length="2" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="plain"
+                     direction="out"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <doc xml:whitespace="preserve">Plaintext output data</doc>
+            <array length="2" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="len"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full">
+            <doc xml:whitespace="preserve">16 byte aligned length of ciphertext and plaintext data.</doc>
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="encrypt" c:identifier="mega_aes_key_encrypt">
+        <doc xml:whitespace="preserve">Encrypt binary data into ubase64 encoded string.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">UBase64 encoded ciphertext.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="plain" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Plaintext input data</doc>
+            <array length="1" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">16 byte aligned length of plaintext data.</doc>
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="encrypt_cbc" c:identifier="mega_aes_key_encrypt_cbc">
+        <doc xml:whitespace="preserve">Encrypt plaintext blocks using AES key in CBC mode with zero IV into UBase64
+ciphertext.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">UBase64 encoded ciphertext.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="plain" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Plaintext input data</doc>
+            <array length="1" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">16 byte aligned length of plaintext data.</doc>
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="encrypt_cbc_raw"
+              c:identifier="mega_aes_key_encrypt_cbc_raw">
+        <doc xml:whitespace="preserve">Encrypt plaintext blocks using AES key in CBC mode with zero IV</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="plain" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Plaintext input data</doc>
+            <array length="2" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="cipher"
+                     direction="out"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <doc xml:whitespace="preserve">Ciphertext</doc>
+            <array length="2" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">16 byte aligned length of plaintext data.</doc>
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="encrypt_ctr" c:identifier="mega_aes_key_encrypt_ctr">
+        <doc xml:whitespace="preserve">Encrypt plaintext blocks using AES key in CTR mode.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="from" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Plaintext input data</doc>
+            <array length="2" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="to"
+                     direction="out"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <doc xml:whitespace="preserve">Ciphertext</doc>
+            <array length="2" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">16 byte aligned length of plaintext data.</doc>
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="encrypt_raw" c:identifier="mega_aes_key_encrypt_raw">
+        <doc xml:whitespace="preserve">Encrypt plaintext blocks using AES key</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="plain" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Plaintext input data</doc>
+            <array length="2" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="cipher"
+                     direction="out"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <doc xml:whitespace="preserve">Ciphertext</doc>
+            <array length="2" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">16 byte aligned length of plaintext data.</doc>
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="encrypt_string_cbc"
+              c:identifier="mega_aes_key_encrypt_string_cbc">
+        <doc xml:whitespace="preserve">Zero pad zero terminated string to align data to a AES block size, and
+encrypt into UBase64 encoded ciphertext.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">UBase64 encoded ciphertext.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="str" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Zero terminated string.</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="generate" c:identifier="mega_aes_key_generate">
+        <doc xml:whitespace="preserve">Initialize key with random data.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="generate_from_password"
+              c:identifier="mega_aes_key_generate_from_password">
+        <doc xml:whitespace="preserve">Initialize key from plaintext password string. (Mega.co.nz algorithm)</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="password" transfer-ownership="none">
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_binary" c:identifier="mega_aes_key_get_binary">
+        <doc xml:whitespace="preserve">Get 16 byte AES key data.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">Key data</doc>
+          <array zero-terminated="0" c:type="guchar*" fixed-size="16">
+            <type name="guint8"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="get_enc_binary" c:identifier="mega_aes_key_get_enc_binary">
+        <doc xml:whitespace="preserve">Get 16 byte AES key data encrypted with #enc_key.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">Key data</doc>
+          <array zero-terminated="0" c:type="guchar*" fixed-size="16">
+            <type name="guint8"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="enc_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Encryption key.</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_enc_ubase64"
+              c:identifier="mega_aes_key_get_enc_ubase64">
+        <doc xml:whitespace="preserve">Get UBase64 encoded key data encrypted with #enc_key.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">UBase64 encoded string.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="enc_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Encryption key.</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_ubase64" c:identifier="mega_aes_key_get_ubase64">
+        <doc xml:whitespace="preserve">Get UBase64 encoded key data.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">UBase64 encoded string.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="is_loaded" c:identifier="mega_aes_key_is_loaded">
+        <doc xml:whitespace="preserve">Check if key was successfully loaded. This is useful, when you've created key
+with #mega_aes_key_new_from_ubase64, and you want to check if it was created
+correctly.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if loaded correctly.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="load_binary" c:identifier="mega_aes_key_load_binary">
+        <doc xml:whitespace="preserve">Initialize key from #data.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">16 byte AES key buffer</doc>
+            <array zero-terminated="0" c:type="guchar*" fixed-size="16">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="load_enc_binary"
+              c:identifier="mega_aes_key_load_enc_binary">
+        <doc xml:whitespace="preserve">Initialize key from #data.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">16 byte AES key buffer</doc>
+            <array zero-terminated="0" c:type="guchar*" fixed-size="16">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="dec_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Decryption key</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="load_enc_ubase64"
+              c:identifier="mega_aes_key_load_enc_ubase64">
+        <doc xml:whitespace="preserve">Initialize key from #data.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE on success.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">UBase64 encoded 16 byte AES key data</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+          <parameter name="dec_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Decryption key</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="load_ubase64" c:identifier="mega_aes_key_load_ubase64">
+        <doc xml:whitespace="preserve">Initialize key from #data.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE on success.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">UBase64 encoded 16 byte AES key data</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="make_username_hash"
+              c:identifier="mega_aes_key_make_username_hash">
+        <doc xml:whitespace="preserve">Generate username hash (uh paraemter for 'us' API call) used for authentication to Mega.co.nz.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">Username hash string</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="username" transfer-ownership="none">
+            <doc xml:whitespace="preserve">E-mail</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="setup_ctr" c:identifier="mega_aes_key_setup_ctr">
+        <doc xml:whitespace="preserve">Setup CTR mode encryption/decryption.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="aes_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaAesKey</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </instance-parameter>
+          <parameter name="nonce" transfer-ownership="none">
+            <doc xml:whitespace="preserve">8-byte nonce buffer</doc>
+            <array zero-terminated="0" c:type="guchar*" fixed-size="8">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="position" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Counter value (block index)</doc>
+            <type name="guint64" c:type="guint64"/>
+          </parameter>
+        </parameters>
+      </method>
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="priv">
+        <type name="AesKeyPrivate" c:type="MegaAesKeyPrivate*"/>
+      </field>
+    </class>
+    <record name="AesKeyClass"
+            c:type="MegaAesKeyClass"
+            glib:is-gtype-struct-for="AesKey">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+    </record>
+    <record name="AesKeyPrivate" c:type="MegaAesKeyPrivate" disguised="1">
+    </record>
+    <class name="ChunkedCbcMac"
+           c:symbol-prefix="chunked_cbc_mac"
+           c:type="MegaChunkedCbcMac"
+           parent="GObject.Object"
+           glib:type-name="MegaChunkedCbcMac"
+           glib:get-type="mega_chunked_cbc_mac_get_type"
+           glib:type-struct="ChunkedCbcMacClass">
+      <constructor name="new" c:identifier="mega_chunked_cbc_mac_new">
+        <doc xml:whitespace="preserve">Create new #MegaChunkedCbcMac object.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaChunkedCbcMac object.</doc>
+          <type name="ChunkedCbcMac" c:type="MegaChunkedCbcMac*"/>
+        </return-value>
+      </constructor>
+      <method name="finish" c:identifier="mega_chunked_cbc_mac_finish">
+        <doc xml:whitespace="preserve">Description...</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="mac" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaChunkedCbcMac</doc>
+            <type name="ChunkedCbcMac" c:type="MegaChunkedCbcMac*"/>
+          </instance-parameter>
+          <parameter name="meta_mac" transfer-ownership="none">
+            <type name="guint8" c:type="guchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="setup" c:identifier="mega_chunked_cbc_mac_setup">
+        <doc xml:whitespace="preserve">Description...</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="mac" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaChunkedCbcMac</doc>
+            <type name="ChunkedCbcMac" c:type="MegaChunkedCbcMac*"/>
+          </instance-parameter>
+          <parameter name="key" transfer-ownership="none">
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </parameter>
+          <parameter name="iv" transfer-ownership="none">
+            <type name="guint8" c:type="guchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="update" c:identifier="mega_chunked_cbc_mac_update">
+        <doc xml:whitespace="preserve">Description...</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="mac" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaChunkedCbcMac</doc>
+            <type name="ChunkedCbcMac" c:type="MegaChunkedCbcMac*"/>
+          </instance-parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">@gsize len:</doc>
+            <type name="guint8" c:type="const guchar*"/>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="priv">
+        <type name="ChunkedCbcMacPrivate" c:type="MegaChunkedCbcMacPrivate*"/>
+      </field>
+    </class>
+    <record name="ChunkedCbcMacClass"
+            c:type="MegaChunkedCbcMacClass"
+            glib:is-gtype-struct-for="ChunkedCbcMac">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+    </record>
+    <record name="ChunkedCbcMacPrivate"
+            c:type="MegaChunkedCbcMacPrivate"
+            disguised="1">
+    </record>
+    <enumeration name="HexFormat"
+                 glib:type-name="MegaHexFormat"
+                 glib:get-type="mega_hex_format_get_type"
+                 c:type="MegaHexFormat">
+      <member name="packed"
+              value="0"
+              c:identifier="MEGA_HEX_FORMAT_PACKED"
+              glib:nick="packed">
+      </member>
+      <member name="c"
+              value="1"
+              c:identifier="MEGA_HEX_FORMAT_C"
+              glib:nick="c">
+      </member>
+      <member name="string"
+              value="2"
+              c:identifier="MEGA_HEX_FORMAT_STRING"
+              glib:nick="string">
+      </member>
+    </enumeration>
+    <class name="HttpClient"
+           c:symbol-prefix="http_client"
+           c:type="MegaHttpClient"
+           parent="GObject.Object"
+           glib:type-name="MegaHttpClient"
+           glib:get-type="mega_http_client_get_type"
+           glib:type-struct="HttpClientClass">
+      <doc xml:whitespace="preserve">Simple HTTP client with support for:
+
+  - TLS/SSL
+  - Persistent connections whenever possible
+  - Gio streams API
+  - Automatic error recovery
+
+Note that you can't have multiple requests at once in one http client.
+If you want to make multiple connections at once, create multiple HTTP
+clients.
+
+After non HTTP error, the client will restart the connection for the next 
+request.</doc>
+      <constructor name="new" c:identifier="mega_http_client_new">
+        <doc xml:whitespace="preserve">Create new #MegaHttpClient object.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaHttpClient object.</doc>
+          <type name="HttpClient" c:type="MegaHttpClient*"/>
+        </return-value>
+      </constructor>
+      <method name="close" c:identifier="mega_http_client_close" throws="1">
+        <doc xml:whitespace="preserve">Description...</doc>
+        <return-value transfer-ownership="none">
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="http_client" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaHttpClient</doc>
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </instance-parameter>
+          <parameter name="force" transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+          <parameter name="cancellable"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <type name="Gio.Cancellable" c:type="GCancellable*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_response_length"
+              c:identifier="mega_http_client_get_response_length"
+              throws="1">
+        <doc xml:whitespace="preserve">Description...</doc>
+        <return-value transfer-ownership="none">
+          <type name="gint64" c:type="gint64"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="http_client" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaHttpClient</doc>
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </instance-parameter>
+          <parameter name="cancellable"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">@err</doc>
+            <type name="Gio.Cancellable" c:type="GCancellable*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="post" c:identifier="mega_http_client_post" throws="1">
+        <doc xml:whitespace="preserve">Start a new POST request.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">IO stream you'd use to write request body and read response.</doc>
+          <type name="HttpIOStream" c:type="MegaHttpIOStream*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="http_client" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaHttpClient</doc>
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </instance-parameter>
+          <parameter name="url" transfer-ownership="none">
+            <doc xml:whitespace="preserve">URL to make the POST to.</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+          <parameter name="request_length" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Length of the request body.</doc>
+            <type name="gint64" c:type="gint64"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="post_simple"
+              c:identifier="mega_http_client_post_simple"
+              throws="1">
+        <doc xml:whitespace="preserve">Make a POST request. Simplified interface.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">Response body.</doc>
+          <type name="GLib.String" c:type="GString*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="http_client" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaHttpClient</doc>
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </instance-parameter>
+          <parameter name="url" transfer-ownership="none">
+            <doc xml:whitespace="preserve">URL to make the POST to.</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+          <parameter name="body" transfer-ownership="none">
+            <doc xml:whitespace="preserve">POST request body.</doc>
+            <array length="2" zero-terminated="0" c:type="gchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="body_len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Length of the POST request body.</doc>
+            <type name="gssize" c:type="gssize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="read" c:identifier="mega_http_client_read" throws="1">
+        <doc xml:whitespace="preserve">Description...</doc>
+        <return-value transfer-ownership="none">
+          <type name="gssize" c:type="gssize"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="http_client" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaHttpClient</doc>
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </instance-parameter>
+          <parameter name="buffer" transfer-ownership="none">
+            <type name="guint8" c:type="guchar*"/>
+          </parameter>
+          <parameter name="count" transfer-ownership="none">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+          <parameter name="cancellable"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <type name="Gio.Cancellable" c:type="GCancellable*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_content_length"
+              c:identifier="mega_http_client_set_content_length">
+        <doc xml:whitespace="preserve">Set content length header.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="http_client" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaHttpClient</doc>
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </instance-parameter>
+          <parameter name="content_length" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Content length.</doc>
+            <type name="guint64" c:type="guint64"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_content_type"
+              c:identifier="mega_http_client_set_content_type">
+        <doc xml:whitespace="preserve">Set content type header.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="http_client" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaHttpClient</doc>
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </instance-parameter>
+          <parameter name="content_type" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Content type.</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_header" c:identifier="mega_http_client_set_header">
+        <doc xml:whitespace="preserve">Set request header.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="http_client" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaHttpClient</doc>
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </instance-parameter>
+          <parameter name="name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Header name (case sensitive)</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none" allow-none="1">
+            <doc xml:whitespace="preserve">Header value. Pass null to remove the header.</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="write" c:identifier="mega_http_client_write" throws="1">
+        <doc xml:whitespace="preserve">Description...</doc>
+        <return-value transfer-ownership="none">
+          <type name="gssize" c:type="gssize"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="http_client" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaHttpClient</doc>
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </instance-parameter>
+          <parameter name="buffer" transfer-ownership="none">
+            <type name="guint8" c:type="const guchar*"/>
+          </parameter>
+          <parameter name="count" transfer-ownership="none">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+          <parameter name="cancellable"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <type name="Gio.Cancellable" c:type="GCancellable*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="priv">
+        <type name="HttpClientPrivate" c:type="MegaHttpClientPrivate*"/>
+      </field>
+    </class>
+    <record name="HttpClientClass"
+            c:type="MegaHttpClientClass"
+            glib:is-gtype-struct-for="HttpClient">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+    </record>
+    <enumeration name="HttpClientError"
+                 glib:type-name="MegaHttpClientError"
+                 glib:get-type="mega_http_client_error_get_type"
+                 c:type="MegaHttpClientError"
+                 glib:error-domain="mega-http-client-error-quark">
+      <member name="connection_broken"
+              value="0"
+              c:identifier="MEGA_HTTP_CLIENT_ERROR_CONNECTION_BROKEN"
+              glib:nick="connection-broken">
+      </member>
+      <member name="server_busy"
+              value="1"
+              c:identifier="MEGA_HTTP_CLIENT_ERROR_SERVER_BUSY"
+              glib:nick="server-busy">
+      </member>
+      <member name="other"
+              value="2"
+              c:identifier="MEGA_HTTP_CLIENT_ERROR_OTHER"
+              glib:nick="other">
+      </member>
+      <function name="quark" c:identifier="mega_http_client_error_quark">
+        <return-value transfer-ownership="none">
+          <type name="GLib.Quark" c:type="GQuark"/>
+        </return-value>
+      </function>
+    </enumeration>
+    <record name="HttpClientPrivate"
+            c:type="MegaHttpClientPrivate"
+            disguised="1">
+    </record>
+    <class name="HttpIOStream"
+           c:symbol-prefix="http_io_stream"
+           c:type="MegaHttpIOStream"
+           parent="Gio.IOStream"
+           glib:type-name="MegaHttpIOStream"
+           glib:get-type="mega_http_io_stream_get_type"
+           glib:type-struct="HttpIOStreamClass">
+      <constructor name="new" c:identifier="mega_http_io_stream_new">
+        <doc xml:whitespace="preserve">Create new #MegaHttpIOStream object.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaHttpIOStream object.</doc>
+          <type name="HttpIOStream" c:type="MegaHttpIOStream*"/>
+        </return-value>
+        <parameters>
+          <parameter name="client" transfer-ownership="none">
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <property name="client"
+                writable="1"
+                construct-only="1"
+                transfer-ownership="none">
+        <type name="GObject.Object"/>
+      </property>
+      <field name="parent">
+        <type name="Gio.IOStream" c:type="GIOStream"/>
+      </field>
+      <field name="priv">
+        <type name="HttpIOStreamPrivate" c:type="MegaHttpIOStreamPrivate*"/>
+      </field>
+    </class>
+    <record name="HttpIOStreamClass"
+            c:type="MegaHttpIOStreamClass"
+            glib:is-gtype-struct-for="HttpIOStream">
+      <field name="parent_class">
+        <type name="Gio.IOStreamClass" c:type="GIOStreamClass"/>
+      </field>
+    </record>
+    <record name="HttpIOStreamPrivate"
+            c:type="MegaHttpIOStreamPrivate"
+            disguised="1">
+    </record>
+    <class name="HttpInputStream"
+           c:symbol-prefix="http_input_stream"
+           c:type="MegaHttpInputStream"
+           parent="Gio.InputStream"
+           glib:type-name="MegaHttpInputStream"
+           glib:get-type="mega_http_input_stream_get_type"
+           glib:type-struct="HttpInputStreamClass">
+      <constructor name="new" c:identifier="mega_http_input_stream_new">
+        <doc xml:whitespace="preserve">Create new #MegaHttpInputStream object.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaHttpInputStream object.</doc>
+          <type name="HttpInputStream" c:type="MegaHttpInputStream*"/>
+        </return-value>
+        <parameters>
+          <parameter name="client" transfer-ownership="none">
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <method name="get_length"
+              c:identifier="mega_http_input_stream_get_length"
+              throws="1">
+        <doc xml:whitespace="preserve">Description...</doc>
+        <return-value transfer-ownership="none">
+          <type name="gssize" c:type="gssize"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="http_input_stream"
+                              transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaHttpInputStream</doc>
+            <type name="HttpInputStream" c:type="MegaHttpInputStream*"/>
+          </instance-parameter>
+          <parameter name="cancellable"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <type name="Gio.Cancellable" c:type="GCancellable*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <property name="client"
+                writable="1"
+                construct-only="1"
+                transfer-ownership="none">
+        <type name="HttpClient"/>
+      </property>
+      <field name="parent">
+        <type name="Gio.InputStream" c:type="GInputStream"/>
+      </field>
+      <field name="priv">
+        <type name="HttpInputStreamPrivate"
+              c:type="MegaHttpInputStreamPrivate*"/>
+      </field>
+    </class>
+    <record name="HttpInputStreamClass"
+            c:type="MegaHttpInputStreamClass"
+            glib:is-gtype-struct-for="HttpInputStream">
+      <field name="parent_class">
+        <type name="Gio.InputStreamClass" c:type="GInputStreamClass"/>
+      </field>
+    </record>
+    <record name="HttpInputStreamPrivate"
+            c:type="MegaHttpInputStreamPrivate"
+            disguised="1">
+    </record>
+    <class name="HttpOutputStream"
+           c:symbol-prefix="http_output_stream"
+           c:type="MegaHttpOutputStream"
+           parent="Gio.OutputStream"
+           glib:type-name="MegaHttpOutputStream"
+           glib:get-type="mega_http_output_stream_get_type"
+           glib:type-struct="HttpOutputStreamClass">
+      <constructor name="new" c:identifier="mega_http_output_stream_new">
+        <doc xml:whitespace="preserve">Create new #MegaHttpOutputStream object.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaHttpOutputStream object.</doc>
+          <type name="HttpOutputStream" c:type="MegaHttpOutputStream*"/>
+        </return-value>
+        <parameters>
+          <parameter name="client" transfer-ownership="none">
+            <type name="HttpClient" c:type="MegaHttpClient*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <property name="client"
+                writable="1"
+                construct-only="1"
+                transfer-ownership="none">
+        <type name="HttpClient"/>
+      </property>
+      <field name="parent">
+        <type name="Gio.OutputStream" c:type="GOutputStream"/>
+      </field>
+      <field name="priv">
+        <type name="HttpOutputStreamPrivate"
+              c:type="MegaHttpOutputStreamPrivate*"/>
+      </field>
+    </class>
+    <record name="HttpOutputStreamClass"
+            c:type="MegaHttpOutputStreamClass"
+            glib:is-gtype-struct-for="HttpOutputStream">
+      <field name="parent_class">
+        <type name="Gio.OutputStreamClass" c:type="GOutputStreamClass"/>
+      </field>
+    </record>
+    <record name="HttpOutputStreamPrivate"
+            c:type="MegaHttpOutputStreamPrivate"
+            disguised="1">
+    </record>
+    <class name="RsaKey"
+           c:symbol-prefix="rsa_key"
+           c:type="MegaRsaKey"
+           parent="GObject.Object"
+           glib:type-name="MegaRsaKey"
+           glib:get-type="mega_rsa_key_get_type"
+           glib:type-struct="RsaKeyClass">
+      <doc xml:whitespace="preserve">2048 bit RSA key is used for authentication and sharing file keys between
+users of Mega.co.nz.
+
+This object allows you to load RSA key in mega's format, and use it for
+encryption/decryption.
+
+It is also possible to generate new RSA key, for example if you want to
+change it, or register new Mega.co.nz account.
+
+There is also a helper method provided to simplify decryption of session id
+during authentication.</doc>
+      <constructor name="new" c:identifier="mega_rsa_key_new">
+        <doc xml:whitespace="preserve">Create new #MegaRsaKey object.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">#MegaRsaKey object.</doc>
+          <type name="RsaKey" c:type="MegaRsaKey*"/>
+        </return-value>
+      </constructor>
+      <method name="decrypt" c:identifier="mega_rsa_key_decrypt">
+        <doc xml:whitespace="preserve">Decrypt data.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">Binary plaintext data (includes random padding).</doc>
+          <type name="GLib.Bytes" c:type="GBytes*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="rsa_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaRsaKey</doc>
+            <type name="RsaKey" c:type="MegaRsaKey*"/>
+          </instance-parameter>
+          <parameter name="cipher" transfer-ownership="none">
+            <doc xml:whitespace="preserve">UBase64 encoded ciphertext.</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="decrypt_sid" c:identifier="mega_rsa_key_decrypt_sid">
+        <doc xml:whitespace="preserve">Decrypt Mega.co.nz session ID.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">Session ID string.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="rsa_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaRsaKey</doc>
+            <type name="RsaKey" c:type="MegaRsaKey*"/>
+          </instance-parameter>
+          <parameter name="cipher" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Encrypted session id (CSID).</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="encrypt" c:identifier="mega_rsa_key_encrypt">
+        <doc xml:whitespace="preserve">Encrypt data (data are random padded to the size of the modulus).</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">UBase64 encoded MPI.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="rsa_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaRsaKey</doc>
+            <type name="RsaKey" c:type="MegaRsaKey*"/>
+          </instance-parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Plaintext data.</doc>
+            <array length="1" zero-terminated="0" c:type="guchar*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Length of the plaintext data (must be less than 256 bytes).</doc>
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="generate" c:identifier="mega_rsa_key_generate">
+        <doc xml:whitespace="preserve">Generate new RSA key.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE on success.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="rsa_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaRsaKey</doc>
+            <type name="RsaKey" c:type="MegaRsaKey*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="get_enc_privk" c:identifier="mega_rsa_key_get_enc_privk">
+        <doc xml:whitespace="preserve">Get encrypted private key in Mega.co.nz format.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">Encrypted private key.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="rsa_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaRsaKey</doc>
+            <type name="RsaKey" c:type="MegaRsaKey*"/>
+          </instance-parameter>
+          <parameter name="enc_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">AES key used for encryption.</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_pubk" c:identifier="mega_rsa_key_get_pubk">
+        <doc xml:whitespace="preserve">Get public key in Mega.co.nz format.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">Public key.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="rsa_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaRsaKey</doc>
+            <type name="RsaKey" c:type="MegaRsaKey*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="load_enc_privk" c:identifier="mega_rsa_key_load_enc_privk">
+        <doc xml:whitespace="preserve">Load encrypted private key.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE on success.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="rsa_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaRsaKey</doc>
+            <type name="RsaKey" c:type="MegaRsaKey*"/>
+          </instance-parameter>
+          <parameter name="privk" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Mega.co.nz formatted AES encrypted private key.</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+          <parameter name="enc_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">AES key used for decryption.</doc>
+            <type name="AesKey" c:type="MegaAesKey*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="load_pubk" c:identifier="mega_rsa_key_load_pubk">
+        <doc xml:whitespace="preserve">Load public key.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE on success.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="rsa_key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #MegaRsaKey</doc>
+            <type name="RsaKey" c:type="MegaRsaKey*"/>
+          </instance-parameter>
+          <parameter name="pubk" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Mega.co.nz formatted public key.</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="priv">
+        <type name="RsaKeyPrivate" c:type="MegaRsaKeyPrivate*"/>
+      </field>
+    </class>
+    <record name="RsaKeyClass"
+            c:type="MegaRsaKeyClass"
+            glib:is-gtype-struct-for="RsaKey">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+    </record>
+    <record name="RsaKeyPrivate" c:type="MegaRsaKeyPrivate" disguised="1">
+    </record>
+    <function name="base64urldecode" c:identifier="mega_base64urldecode">
+      <return-value transfer-ownership="full">
+        <array length="1" zero-terminated="0" c:type="guchar*">
+          <type name="guint8"/>
+        </array>
+      </return-value>
+      <parameters>
+        <parameter name="str" transfer-ownership="none">
+          <type name="utf8" c:type="const gchar*"/>
+        </parameter>
+        <parameter name="len"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="gsize" c:type="gsize*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="base64urlencode" c:identifier="mega_base64urlencode">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="data" transfer-ownership="none">
+          <array length="1" zero-terminated="0" c:type="guchar*">
+            <type name="guint8"/>
+          </array>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <type name="gsize" c:type="gsize"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="format_hex" c:identifier="mega_format_hex">
+      <return-value transfer-ownership="full">
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="data" transfer-ownership="none">
+          <array length="1" zero-terminated="0" c:type="guchar*">
+            <type name="guint8"/>
+          </array>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <type name="gsize" c:type="gsize"/>
+        </parameter>
+        <parameter name="fmt" transfer-ownership="none">
+          <type name="HexFormat" c:type="MegaHexFormat"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="gbytes_to_string" c:identifier="mega_gbytes_to_string">
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">Data</doc>
+        <array length="1" zero-terminated="0" c:type="guchar*">
+          <type name="guint8"/>
+        </array>
+      </return-value>
+      <parameters>
+        <parameter name="bytes" transfer-ownership="none">
+          <type name="GLib.Bytes" c:type="GBytes*"/>
+        </parameter>
+        <parameter name="len"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <type name="gsize" c:type="gsize*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="http_client_error_quark"
+              c:identifier="mega_http_client_error_quark"
+              moved-to="HttpClientError.quark">
+      <return-value transfer-ownership="none">
+        <type name="GLib.Quark" c:type="GQuark"/>
+      </return-value>
+    </function>
+  </namespace>
+</repository>
